@@ -83,7 +83,7 @@ document.addEventListener("DOMContentLoaded", () => {
                             .then((response) => response.json())
                             .then(() => {
                                 listItem.remove();
-                               alert("Film deleted successfully");
+                                alert("Film deleted successfully");
                             })
                             .catch((error) => {
                                 console.error("Error deleting the film:", error);
@@ -122,7 +122,40 @@ document.addEventListener("DOMContentLoaded", () => {
             });
     }
 
-  
+    // Function to search films by title
+    function searchFilms() {
+        const searchInput = document.getElementById("search-input");
+        const searchButton = document.getElementById("search-button");
+
+        searchButton.onclick = () => {
+            const query = searchInput.value.toLowerCase();
+            fetch("http://localhost:3000/films")
+                .then((response) => response.json())
+                .then((data) => {
+                    const searchResults = data.filter(film => film.title.toLowerCase().includes(query));
+                    const parentList = document.getElementById("films");
+                    parentList.innerHTML = '';  // Clear the list first
+
+                    if (searchResults.length === 0) {
+                        parentList.innerHTML = "<p>No films found matching your search.</p>";
+                    } else {
+                        searchResults.forEach(film => {
+                            const listItem = document.createElement('li');
+                            listItem.textContent = film.title;
+                            listItem.classList.add('film', 'item');
+                            let movieId = film.id;
+                            listItem.onclick = () => displayFilmDetails(movieId);
+                            parentList.appendChild(listItem);
+                        });
+                    }
+                })
+                .catch((error) => {
+                    console.error("Error fetching the films list for search:", error);
+                });
+        };
+    }
+
     listMovies();
     showSoldOutMovies();
+    searchFilms();
 });
